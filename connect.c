@@ -89,7 +89,7 @@ int serverDriver(void)
 
 	sin_size = sizeof(connAddr);
 
-	printf("Accepting\n");
+	printf("Waiting for client to connect...\n");
 
 	if((clientFd = accept(sockfd, (struct sockaddr*)&connAddr, &sin_size)) == -1)
 	{
@@ -98,6 +98,8 @@ int serverDriver(void)
 
 		return -1;
 	}
+
+	printf("Client connected. Initializing game.\n");
 
 	// Maybe close?
 	// char *buf = "HELLO WORLD!";
@@ -130,9 +132,9 @@ int clientDriver(const char* ip)
 	}
 
 	freeaddrinfo(servinfo);
+	printf("Connected to server. Waiting for server to initialize.\n");
 
 	// Maybe close?
-
 
 	return sockfd;
 }

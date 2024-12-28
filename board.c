@@ -1,4 +1,7 @@
 #include "board.h"
+#include <sys/socket.h>
+#include <stdbool.h>
+#include "packet.h"
 
 void drawBoard(char board[3][3])
 {
@@ -37,6 +40,52 @@ int placeMarker(int row, int col, int player, char board[3][3])
 		marker = 'O';
 
 	board[row][col] = marker;
+	drawBoard(board);
+
+	return 0;
+}
+
+int gameLoop(bool IS_GAME_RUNNING, bool player, int sockfd, char board[3][3])
+{
+	bool playerTurn = 0;
+	unsigned char row, col, code, buf;
+	int read_result;
+
+	while(IS_GAME_RUNNING)
+	{
+		if(playerTurn == player)
+		{
+			printf("Enter the row and column [r, c]:\n");
+			scanf(" [%hhu, %hhu]", &row, &col);
+
+			code = encode(row, col, player);
+
+			if(send(sockfd, (unsigned char*)&code ,sizeof(unsigned char), 0) == -1)
+			{
+				perror("Error in send()");
+			}
+
+			placeMarker(row, col, player, board);
+
+			playerTurn = !playerTurn;
+		}
+
+		else 
+		{
+			printf("Waiting for player %d...", !player);
+
+			if((read_result = recv(sockfd, (unsigned char*)&buf, sizeof(unsigned char), 0)) == -1)
+			{
+				perror("Client receive");
+				perror(NULL);
+			}
+
+			struct packet p = decode(buf);
+			
+			placeMarker(p.row, p.col, !player, board);
+			playerTurn = !playerTurn;
+		}
+	}
 
 	return 0;
 }
