@@ -37,28 +37,31 @@ int setInfo(char* ip, struct addrinfo *hints, struct addrinfo **servInfo, int* s
 		else
 			perror("Error on socket(), server");
 	}
+
+	return 0;
 }
 
+// Return the socket file descriptor
 int serverDriver(void)
 {
 	struct sockaddr_storage connAddr;
 	socklen_t sin_size;
 	int status, sockfd, clientFd;
-	struct addrinfo hints;
-	struct addrinfo *servinfo;
+	struct addrinfo hints, *servinfo;
 
 	memset(&hints, 0, sizeof(hints));
 
 	// IPv4
 	hints.ai_flags = AI_PASSIVE;
 
-	setInfo(NULL, &hints, &servinfo, &sockfd);
+	if(setInfo(NULL, &hints, &servinfo, &sockfd) != 0)
+		return -1;
 
 	int yes = 1;
 
 	if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
 	{
-		perror("setsockopt");
+		perror("setsockopt() error:");
 		perror(NULL);
 
 		return -1;
@@ -66,7 +69,7 @@ int serverDriver(void)
 
 	if(bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen) == -1)
 	{
-		fprintf(stderr, "Failed to bind socket\n");
+		perror("Failed to bind socket\n");
 		perror(NULL);
 
 		return -1;
@@ -77,7 +80,7 @@ int serverDriver(void)
 	// Listen etc.
 	if((listen(sockfd, 5)) == -1)
 	{
-		fprintf(stderr, "Failed on listen()\n");
+		perror("Failed on listen()\n");
 		perror(NULL);
 
 		return -1;
@@ -90,7 +93,7 @@ int serverDriver(void)
 
 	if((clientFd = accept(sockfd, (struct sockaddr*)&connAddr, &sin_size)) == -1)
 	{
-		fprintf(stderr, "Failed on accept()\n");
+		perror("Failed on accept()\n");
 		perror(NULL);
 
 		return -1;
@@ -99,12 +102,8 @@ int serverDriver(void)
 	// Maybe close?
 	// char *buf = "HELLO WORLD!";
 
-	if(send(clientFd, "Hello World", 13, 0) == -1)
-	{
-		perror("send");
-	}
 
-	return 0;
+	return clientFd;
 }
 
 int clientDriver(const char* ip)
@@ -118,33 +117,23 @@ int clientDriver(const char* ip)
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	setInfo("127.0.0.1", &hints, &servinfo, &sockfd);
+	if(setInfo("127.0.0.1", &hints, &servinfo, &sockfd) != 0)
+		return -1;
 
 	if(connect(sockfd, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
 	{
 		close(sockfd);
-		perror("client: connect");
+		perror("Failed to connect");
+		perror(NULL);
+
 		return -1;
 	}
+
 	freeaddrinfo(servinfo);
 
 	// Maybe close?
-	char buf[80];
 
-	int read_result;
 
-	if((read_result = recv(sockfd, buf, 80, 0)) == -1)
-	{
-		perror("recv");
-		return -1;
-	}
-
-	// buf[79] = '\n';
-
-	printf("%s", buf);
-
-	// Clean up
-
-	return 0;
+	return sockfd;
 }
 
