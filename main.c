@@ -6,6 +6,7 @@
 #include "consts.h"
 #include "board.h"
 #include <stdbool.h>
+#include <unistd.h>
 
 void runServer(void);
 void runClient(void);
@@ -45,6 +46,9 @@ void runServer(void)
 	sockfd = serverDriver();
 	IS_GAME_RUNNING = true;
 
+	if(sockfd == -1)
+		return;
+
 	// Packet is in the form:	row	col	player
 	//				00	00	0
 	// 0 indicates a single bit
@@ -52,15 +56,20 @@ void runServer(void)
 
 	drawBoard(board);
 	
-	gameLoop(IS_GAME_RUNNING, 0, sockfd, board);
+	if(gameLoop(IS_GAME_RUNNING, 0, sockfd, board) == -1)
+		close(sockfd);
 }
 
 void runClient(void)
 {
-	sockfd = clientDriver("127.0.0.1");
+	sockfd = clientDriver("::1");
 	IS_GAME_RUNNING = true;
+
+	if(sockfd == -1)
+		return;
 
 	drawBoard(board);
 
-	gameLoop(IS_GAME_RUNNING, 1, sockfd, board);
+	if(gameLoop(IS_GAME_RUNNING, 1, sockfd, board) == -1)
+		close(sockfd);
 }
