@@ -154,18 +154,23 @@ int gameLoop(bool IS_GAME_RUNNING, bool player, int sockfd, char board[3][3])
 				char inputBuf[5];
 
 				handleErr(boardErr);
-				printf("Enter the row and column as 'c, r':\n");
+				printf("Enter the row and column as 'c, r' or 'X' to exit:\n");
 				
 				fgets(inputBuf, sizeof(inputBuf), stdin);
 
-				if(inputBuf[0] == EOF)
+				if(inputBuf[0] == 'X' || inputBuf[0] == 'x')
 				{
 					exitHost(sockfd, "Control sequence received. Exiting...\n", 0xFF);
 					return 0;
 				}
 
-				sscanf(inputBuf, "%hhu, %hhu", &col, &row);
+				if(inputBuf[5 - 1] != '\n')
+				{
+					char c;
+					while((c = getchar()) != '\n' && c != EOF);
+				}
 
+				sscanf(inputBuf, "%hhu, %hhu", &col, &row);
 
 			}while((boardErr = placeMarker(row, col, player, board)) < 0);
 
