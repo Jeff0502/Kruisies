@@ -12,4 +12,6 @@
 #define CLIENT_WON 2
 #define DRAW 3
 
+#define PORT "8888"
+
 #endif // !DEBUG

@@ -31,7 +31,13 @@ void drawBoard(char board[3][3])
 		fprintf(stdout, "\n");
 		for(int j = 0; j < 3; j++)
 		{
-			fprintf(stdout, " %c ", (char)board[i][j]);
+
+			if((char)board[i][j] == 'X')
+				fprintf(stdout, "\033[91m %c \033[39m", (char)board[i][j]);
+			else if((char)board[i][j] == 'O')
+				fprintf(stdout, "\033[92m %c \033[39m", (char)board[i][j]);
+			else 
+				fprintf(stdout, " %c ", (char)board[i][j]);
 		}
 		
 		fprintf(stdout, "\n");
@@ -145,13 +151,21 @@ int gameLoop(bool IS_GAME_RUNNING, bool player, int sockfd, char board[3][3])
 		if(playerTurn == player)
 		{
 			do{
+				char inputBuf[5];
+
 				handleErr(boardErr);
-				printf("Enter the row and column as 'c, r':\n ");
-				if(scanf(" %hhu, %hhu", &col, &row) == EOF)
+				printf("Enter the row and column as 'c, r':\n");
+				
+				fgets(inputBuf, sizeof(inputBuf), stdin);
+
+				if(inputBuf[0] == EOF)
 				{
 					exitHost(sockfd, "Control sequence received. Exiting...\n", 0xFF);
 					return 0;
 				}
+
+				sscanf(inputBuf, "%hhu, %hhu", &col, &row);
+
 
 			}while((boardErr = placeMarker(row, col, player, board)) < 0);
 

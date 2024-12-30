@@ -10,19 +10,9 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT "8888"
+#include "consts.h"
 
 // Some code from https://beej.us/guide/bgnet/html/split/system-calls-or-bust.html#bind
-
-void *convertInAddr(struct sockaddr *sa)
-{
-	// IPv4
-	if(sa->sa_family == AF_INET)
-		return &((struct sockaddr_in*)sa)->sin_addr;
-	else 
-		return &((struct sockaddr_in6*)sa)->sin6_addr;
-}
-
 int setInfo(char* ip, struct addrinfo *hints, struct addrinfo **servInfo, int* sockfd)
 {
 	int status;
