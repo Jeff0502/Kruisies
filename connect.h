@@ -2,6 +2,6 @@
 #define CONNECT_H
 
 int serverDriver(void);
-int clientDriver(const char*);
+int clientDriver(char*);
 
 #endif // !DEBUG
