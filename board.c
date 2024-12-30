@@ -191,7 +191,7 @@ int gameLoop(bool IS_GAME_RUNNING, bool player, int sockfd, char board[3][3])
 
 		else 
 		{
-			printf("Waiting for player %d...\n ", !player);
+			printf("Waiting for player %d...\n", !player);
 
 			if((read_result = recv(sockfd, (unsigned char*)&buf, sizeof(unsigned char), 0)) == -1)
 			{
