@@ -28,7 +28,7 @@ int setInfo(char* ip, struct addrinfo *hints, struct addrinfo **servInfo, int* s
 	int status;
 
 	// IPv4 or v6
-	hints->ai_family = AF_INET6;
+	hints->ai_family = AF_INET;
 	hints->ai_socktype = SOCK_STREAM;
 
 	if((status = getaddrinfo(ip, PORT, hints, servInfo)) != 0)
