@@ -154,7 +154,7 @@ int gameLoop(bool IS_GAME_RUNNING, bool player, int sockfd, char board[3][3])
 				char inputBuf[5];
 
 				handleErr(boardErr);
-				printf("Enter the row and column as 'c, r' or 'X' to exit:\n");
+				printf("Enter the row and column as 'r, c' or 'X' to exit:\n");
 				
 				fgets(inputBuf, sizeof(inputBuf), stdin);
 
@@ -170,7 +170,7 @@ int gameLoop(bool IS_GAME_RUNNING, bool player, int sockfd, char board[3][3])
 					while((c = getchar()) != '\n' && c != EOF);
 				}
 
-				sscanf(inputBuf, "%hhu, %hhu", &col, &row);
+				sscanf(inputBuf, "%hhu, %hhu", &row, &col);
 
 			}while((boardErr = placeMarker(row, col, player, board)) < 0);
 
