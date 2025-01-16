@@ -6,7 +6,7 @@ SRC := $(wildcard *.c)
 
 OBJ := $(SRC:.c=.o)
 
-BIN := kruisies
+BIN := kruisies.out
 
 %.o:%.c 
 	$(CC) $(FLAGS) -c $< -o $@
